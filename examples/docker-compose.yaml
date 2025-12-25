@@ -1,0 +1,53 @@
+# Docker Compose example for vLLM with Plugin Manager
+#
+# Usage:
+#   docker-compose -f examples/docker-compose.yaml up
+#
+# Or build and run:
+#   docker-compose -f examples/docker-compose.yaml up --build
+
+services:
+  vllm:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        VLLM_VERSION: latest
+
+    # GPU access
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      # Mount your plugin configuration
+      - ./plugins.yaml:/root/.config/vllm/plugins.yaml:ro
+
+      # Persist installed plugins across restarts
+      - vllm-plugins:/root/.local/share/vllm-plugins
+
+      # Optional: Mount local plugin for development
+      # - ../my-local-plugin:/workspace/my-local-plugin:ro
+
+    environment:
+      # Plugin manager configuration
+      - VLLM_PLUGIN_CONFIG=/root/.config/vllm/plugins.yaml
+      - VLLM_PLUGIN_REGISTRY_DIR=/root/.local/share/vllm-plugins
+
+      # vLLM configuration
+      - HF_TOKEN=${HF_TOKEN}
+
+    command:
+      - --model=meta-llama/Llama-3.1-8B-Instruct
+      - --host=0.0.0.0
+      - --port=8000
+
+volumes:
+  vllm-plugins:

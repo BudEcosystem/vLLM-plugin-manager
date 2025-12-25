@@ -1,0 +1,61 @@
+# vLLM Plugin Manifest
+# Place this file in the root of your plugin package as `vllm-plugin.yaml`
+# The plugin manager will read this to understand your plugin's requirements
+
+# Plugin metadata
+name: my-awesome-plugin
+version: 1.0.0
+description: A custom logits processor for specialized decoding
+author: Your Name <your.email@example.com>
+license: Apache-2.0
+homepage: https://github.com/your-org/my-awesome-plugin
+
+# vLLM version compatibility
+# Plugin will only be loaded if vLLM version matches these constraints
+vllm:
+  min_version: "0.6.0"      # Minimum vLLM version (inclusive)
+  max_version: "1.0.0"      # Maximum vLLM version (exclusive)
+
+# Python version compatibility
+python:
+  min_version: "3.9"
+  max_version: "3.13"
+
+# Entry points this plugin provides
+# These should match what's in your pyproject.toml
+entry_points:
+  vllm.general_plugins:
+    - name: my_plugin_register
+      value: my_plugin:register
+
+  vllm.logits_processors:
+    - name: my_processor
+      value: my_plugin.processor:MyLogitsProcessor
+
+  vllm.stat_logger_plugins:
+    - name: my_logger
+      value: my_plugin.logging:MyStatLogger
+
+# Dependencies (informational - actual deps are in pyproject.toml)
+dependencies:
+  - torch>=2.0.0
+  - numpy>=1.24.0
+
+# Optional: Tags for categorization
+tags:
+  - logits-processor
+  - decoding
+  - sampling
+
+# Optional: Configuration schema for runtime settings
+config_schema:
+  type: object
+  properties:
+    temperature_scale:
+      type: number
+      default: 1.0
+      description: Scaling factor for temperature
+    enable_debug:
+      type: boolean
+      default: false
+      description: Enable debug logging

@@ -1,0 +1,28 @@
+# Slim Dockerfile - Just install plugin manager
+# Use this when you want to add plugin manager to an existing vLLM image
+#
+# Build:
+#   docker build -f Dockerfile.slim -t vllm-with-plugins .
+#
+# Usage:
+#   docker run --gpus all -v ./plugins.yaml:/root/.config/vllm/plugins.yaml \
+#     vllm-with-plugins --model meta-llama/Llama-3.1-8B-Instruct
+
+ARG BASE_IMAGE=vllm/vllm-openai:latest
+FROM ${BASE_IMAGE}
+
+# Install only the plugin manager package
+RUN pip install --no-cache-dir \
+    pyyaml>=6.0 \
+    filelock>=3.0 \
+    packaging>=21.0
+
+# Copy plugin manager source
+COPY vllm_plugin_manager /opt/vllm-plugin-manager/vllm_plugin_manager
+COPY pyproject.toml /opt/vllm-plugin-manager/
+
+# Install plugin manager
+RUN pip install --no-cache-dir /opt/vllm-plugin-manager
+
+# Default config location
+ENV VLLM_PLUGIN_CONFIG=/root/.config/vllm/plugins.yaml

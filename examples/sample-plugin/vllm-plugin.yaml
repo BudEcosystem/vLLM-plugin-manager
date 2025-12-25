@@ -1,0 +1,26 @@
+# vLLM Plugin Manifest for Sample Plugin
+
+name: vllm-sample-plugin
+version: 0.1.0
+description: Sample vLLM plugin demonstrating plugin structure
+author: vLLM Plugin Manager Contributors
+license: Apache-2.0
+
+# vLLM version compatibility
+vllm:
+  min_version: "0.6.0"
+  max_version: "1.0.0"
+
+# Entry points provided by this plugin
+entry_points:
+  vllm.general_plugins:
+    - name: sample_plugin
+      value: my_plugin:register
+
+  vllm.logits_processors:
+    - name: sample_processor
+      value: my_plugin.processor:SampleLogitsProcessor
+
+tags:
+  - sample
+  - logits-processor

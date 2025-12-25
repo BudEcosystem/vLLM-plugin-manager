@@ -1,0 +1,33 @@
+# vLLM Plugin Manager Configuration
+# Place this file at ~/.config/vllm/plugins.yaml
+# Or set VLLM_PLUGIN_CONFIG environment variable to point to this file
+
+plugins:
+  # PyPI plugin example
+  - name: vllm-entropy-decoder
+    source: pypi
+    package: vllm-entropy-decoder
+    version: ">=0.1.0"
+    enabled: true
+
+  # Git repository plugin example
+  - name: my-custom-decoder
+    source: git
+    url: https://github.com/example/vllm-custom-decoder.git
+    ref: main  # branch, tag, or commit hash
+    enabled: true
+
+  # Git monorepo plugin example (plugin in subdirectory)
+  - name: monorepo-plugin
+    source: git
+    url: https://github.com/example/vllm-plugins-monorepo.git
+    ref: v1.0.0
+    subdirectory: plugins/my-plugin
+    enabled: false  # disabled - won't be installed
+
+  # Local development plugin example
+  - name: dev-plugin
+    source: local
+    path: /workspace/my-dev-plugin
+    editable: true  # install in editable mode for development
+    enabled: true

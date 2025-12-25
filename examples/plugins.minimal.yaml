@@ -1,0 +1,8 @@
+# Minimal vLLM Plugin Configuration
+# Just install one plugin from PyPI
+
+plugins:
+  - name: vllm-entropy-decoder
+    source: pypi
+    package: vllm-entropy-decoder
+    enabled: true
