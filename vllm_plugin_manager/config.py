@@ -154,9 +154,9 @@ def get_config_path() -> Optional[Path]:
         path = Path(env_path)
         if path.exists():
             return path
-        # If explicitly set but doesn't exist, return the path anyway
-        # (will error later with clear message)
-        return path
+        # If explicitly set but doesn't exist, return None
+        # (user may not have mounted a config file yet)
+        return None
 
     # Check default location
     home = Path.home()

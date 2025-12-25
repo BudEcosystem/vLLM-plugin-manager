@@ -3,6 +3,12 @@
 
 plugins:
   - name: vllm-entropy-decoder
-    source: pypi
+    source: git
+    url: https://github.com/BudEcosystem/vllm-plugins
     package: vllm-entropy-decoder
+    subdirectory: plugins/vllm-entropy-decoder
+    enabled: true
+  - name: artic-inferenc
+    source: git
+    url: https://github.com/snowflakedb/ArcticInference
     enabled: true

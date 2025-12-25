@@ -3,12 +3,22 @@
 import logging
 import multiprocessing
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 
 __version__ = "0.1.0"
 
+# Configure logger with handler if not already configured
 logger = logging.getLogger(__name__)
+if not logger.handlers:
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    ))
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False  # Prevent duplicate logs
 
 # Flag to ensure register() only runs once
 _registered = False
@@ -69,6 +79,9 @@ def register() -> None:
                 logger.info(f"Plugin '{plugin_id}': {message}")
             else:
                 logger.error(f"Plugin '{plugin_id}' failed: {message}")
+
+        if not results:
+            logger.info("No plugins to install")
 
     except Exception as e:
         # Never crash vLLM due to plugin manager errors

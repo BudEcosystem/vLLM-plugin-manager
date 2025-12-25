@@ -123,7 +123,7 @@ plugins:
 
 ## Docker Usage
 
-### Using the Dockerfile
+### Build and Run
 
 ```bash
 # Build the image
@@ -137,6 +137,13 @@ docker run --gpus all \
   --model meta-llama/Llama-3.1-8B-Instruct
 ```
 
+### Custom Base Image
+
+```bash
+# Use your own vLLM image as base
+docker build --build-arg BASE_IMAGE=my-vllm:latest -t vllm-with-plugins .
+```
+
 ### Using Docker Compose
 
 ```bash
@@ -147,14 +154,6 @@ cp examples/plugins.yaml my-plugins.yaml
 docker-compose -f examples/docker-compose.yaml up
 ```
 
-### Slim Dockerfile (Minimal Overhead)
-
-For adding to an existing vLLM image:
-
-```bash
-docker build -f Dockerfile.slim -t my-vllm-plugins .
-```
-
 ## Environment Variables
 
 | Variable | Description | Default |
@@ -162,54 +161,6 @@ docker build -f Dockerfile.slim -t my-vllm-plugins .
 | `VLLM_PLUGIN_CONFIG` | Path to plugins.yaml config file | `~/.config/vllm/plugins.yaml` |
 | `VLLM_PLUGIN_REGISTRY_DIR` | Directory for plugin registry | `~/.local/share/vllm-plugins` |
 
-## How It Works
-
-1. **vLLM Startup**: vLLM loads entry points from `vllm.general_plugins` group
-2. **Plugin Manager Registers**: Our `register()` function is called
-3. **Load Config**: Reads plugin specifications from YAML config
-4. **Install Missing Plugins**: Uses pip to install plugins not yet installed
-5. **Invalidate Cache**: Clears Python's import metadata cache
-6. **vLLM Continues**: Discovers newly installed plugins via entry points
-
-```
-┌─────────────────┐
-│   vLLM Start    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Load Plugins   │◄─── vllm.general_plugins entry point
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Plugin Manager  │
-│   register()    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Load plugins.yaml│
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  pip install    │◄─── For each missing plugin
-│    plugins      │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Invalidate      │
-│ Import Cache    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ vLLM discovers  │
-│  new plugins    │
-└─────────────────┘
-```
 
 ## Plugin Registry
 
