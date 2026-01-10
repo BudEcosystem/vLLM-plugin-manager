@@ -3,11 +3,12 @@
 # Or set VLLM_PLUGIN_CONFIG environment variable to point to this file
 
 plugins:
-  # PyPI plugin example
+  # PyPI plugin example with vLLM version constraint
   - name: vllm-entropy-decoder
     source: pypi
     package: vllm-entropy-decoder
     version: ">=0.1.0"
+    vllm_version: ">=0.6.0"  # Only install if vLLM >= 0.6.0
     enabled: true
 
   # Git repository plugin example
@@ -31,3 +32,12 @@ plugins:
     path: /workspace/my-dev-plugin
     editable: true  # install in editable mode for development
     enabled: true
+
+  # Plugin with environment variables
+  - name: arctic-inference
+    source: git
+    url: https://github.com/snowflakedb/ArcticInference
+    enabled: true
+    env:
+      ARCTIC_INFERENCE_ENABLED: "1"
+      ARCTIC_INFERENCE_SKIP_VERSION_CHECK: "1"

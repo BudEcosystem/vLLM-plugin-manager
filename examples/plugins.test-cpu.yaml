@@ -1,0 +1,7 @@
+# Test config for CPU - only entropy decoder (no CUDA required)
+plugins:
+  - name: vllm-entropy-decoder
+    source: git
+    url: https://github.com/BudEcosystem/vllm-plugins
+    subdirectory: plugins/vllm-entropy-decoder
+    enabled: true

@@ -89,6 +89,40 @@ plugins:
     enabled: true
 ```
 
+### Environment Variables
+
+Plugins may require specific environment variables to be set. You can define these in the plugin config and they will be automatically set before the plugin is loaded:
+
+```yaml
+plugins:
+  - name: arctic-inference
+    source: git
+    url: https://github.com/snowflakedb/ArcticInference
+    enabled: true
+    env:
+      ARCTIC_INFERENCE_ENABLED: "1"
+      ARCTIC_INFERENCE_SKIP_VERSION_CHECK: "1"
+```
+
+### Version Compatibility
+
+You can specify vLLM version requirements for plugins. Incompatible plugins will be skipped with a warning:
+
+```yaml
+plugins:
+  - name: my-plugin
+    source: pypi
+    package: my-plugin
+    enabled: true
+    vllm_version: ">=0.6.0,<1.0.0"  # Only install if vLLM version matches
+```
+
+Supported version specifiers:
+- `>=0.6.0` - minimum version
+- `<1.0.0` - maximum version (exclusive)
+- `>=0.6.0,<1.0.0` - version range
+- `==0.6.0` - exact version
+
 ### Full Example
 
 ```yaml
@@ -119,6 +153,15 @@ plugins:
     source: pypi
     package: vllm-experimental
     enabled: false
+
+  # Plugin with environment variables
+  - name: arctic-inference
+    source: git
+    url: https://github.com/snowflakedb/ArcticInference
+    enabled: true
+    env:
+      ARCTIC_INFERENCE_ENABLED: "1"
+      ARCTIC_INFERENCE_SKIP_VERSION_CHECK: "1"
 ```
 
 ## Docker Usage

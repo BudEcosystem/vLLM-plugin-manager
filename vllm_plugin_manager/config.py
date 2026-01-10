@@ -3,7 +3,7 @@
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import yaml
 
@@ -34,6 +34,12 @@ class PluginSpec:
     # Local source fields
     path: Optional[str] = None
     editable: bool = True
+
+    # Environment variables to set before loading
+    env: Optional[Dict[str, str]] = None
+
+    # vLLM version compatibility constraint (e.g., ">=0.6.0,<1.0.0")
+    vllm_version: Optional[str] = None
 
     @property
     def plugin_id(self) -> str:
@@ -125,6 +131,8 @@ class PluginConfig:
                 subdirectory=plugin_data.get("subdirectory"),
                 path=plugin_data.get("path"),
                 editable=plugin_data.get("editable", True),
+                env=plugin_data.get("env"),
+                vllm_version=plugin_data.get("vllm_version"),
             )
 
             # Validate the spec

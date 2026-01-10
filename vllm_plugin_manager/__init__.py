@@ -93,6 +93,7 @@ from .config import PluginConfig, PluginSpec, ConfigError, get_config_path
 from .manager import PluginManager
 from .core.registry import PluginRegistry, PluginStatus, get_registry_dir
 from .core.discovery import EntryPointDiscovery
+from .core.version import VersionChecker, get_vllm_version, check_vllm_compatibility
 from .sources.installer import PackageInstaller, InstallerError
 
 __all__ = [
@@ -107,6 +108,9 @@ __all__ = [
     "PluginStatus",
     "get_registry_dir",
     "EntryPointDiscovery",
+    "VersionChecker",
+    "get_vllm_version",
+    "check_vllm_compatibility",
     "PackageInstaller",
     "InstallerError",
 ]

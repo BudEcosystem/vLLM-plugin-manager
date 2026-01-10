@@ -1,12 +1,14 @@
 """Plugin Manager - Orchestrates plugin installation and lifecycle."""
 
 import logging
+import os
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 from .config import PluginConfig, PluginSpec
 from .core.registry import PluginRegistry, PluginStatus
 from .core.discovery import EntryPointDiscovery
+from .core.version import VersionChecker
 from .sources.installer import PackageInstaller
 
 logger = logging.getLogger(__name__)
@@ -41,6 +43,37 @@ class PluginManager:
         self.registry = PluginRegistry(registry_dir=registry_dir)
         self.discovery = EntryPointDiscovery()
         self.installer = PackageInstaller()
+        self.version_checker = VersionChecker()
+
+    def _apply_env_vars(self, spec: PluginSpec) -> None:
+        """
+        Apply environment variables from plugin spec.
+
+        Args:
+            spec: Plugin specification with optional env vars
+        """
+        if not spec.env:
+            return
+
+        for key, value in spec.env.items():
+            if value is not None:
+                logger.info(f"Setting environment variable: {key}")
+                os.environ[key] = str(value)
+
+    def _check_compatibility(self, spec: PluginSpec) -> Tuple[bool, str]:
+        """
+        Check if a plugin is compatible with the current vLLM version.
+
+        Args:
+            spec: Plugin specification
+
+        Returns:
+            Tuple of (is_compatible, message)
+        """
+        return self.version_checker.check_plugin_compatibility(
+            plugin_name=spec.name,
+            vllm_constraint=spec.vllm_version,
+        )
 
     def install_plugins(self) -> Dict[str, Tuple[bool, str]]:
         """
@@ -58,6 +91,10 @@ class PluginManager:
             logger.info("No enabled plugins to install")
             return results
 
+        # Apply environment variables from all enabled plugins first
+        for spec in enabled_plugins:
+            self._apply_env_vars(spec)
+
         logger.info(f"Installing {len(enabled_plugins)} plugin(s)")
 
         # Take snapshot before installation for diff detection
@@ -72,6 +109,15 @@ class PluginManager:
             if self.registry.is_installed(plugin_id):
                 logger.info(f"Plugin '{plugin_id}' already installed, skipping")
                 results[plugin_id] = (True, "Already installed")
+                continue
+
+            # Check vLLM version compatibility
+            is_compatible, compat_message = self._check_compatibility(spec)
+            if not is_compatible:
+                logger.warning(
+                    f"Skipping plugin '{plugin_id}': {compat_message}"
+                )
+                results[plugin_id] = (False, f"Incompatible: {compat_message}")
                 continue
 
             # Register as pending

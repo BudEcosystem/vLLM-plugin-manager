@@ -232,3 +232,36 @@ plugins:
 
         # Git plugin ID is the name
         assert config.plugins[1].plugin_id == "my-custom-plugin"
+
+    def test_env_vars_parsing(self, temp_dir: Path):
+        """Test parsing environment variables from plugin config."""
+        from vllm_plugin_manager.config import PluginConfig
+
+        config_file = temp_dir / "plugins.yaml"
+        config_file.write_text("""
+plugins:
+  - name: test-plugin
+    source: pypi
+    package: test-plugin
+    enabled: true
+    env:
+      PLUGIN_ENABLED: "1"
+      PLUGIN_MODE: "production"
+""")
+
+        config = PluginConfig.from_file(config_file)
+        plugin = config.plugins[0]
+
+        assert plugin.env is not None
+        assert plugin.env["PLUGIN_ENABLED"] == "1"
+        assert plugin.env["PLUGIN_MODE"] == "production"
+
+    def test_env_vars_default_none(self, sample_plugins_yaml: Path):
+        """Test that env defaults to None when not specified."""
+        from vllm_plugin_manager.config import PluginConfig
+
+        config = PluginConfig.from_file(sample_plugins_yaml)
+
+        # Existing plugins in sample don't have env vars
+        assert config.plugins[0].env is None
+        assert config.plugins[1].env is None

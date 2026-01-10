@@ -1,0 +1,15 @@
+# Test config for version checking
+plugins:
+  # This should be skipped - requires vLLM >= 99.0.0
+  - name: incompatible-plugin
+    source: pypi
+    package: fake-incompatible-plugin
+    vllm_version: ">=99.0.0"
+    enabled: true
+
+  # This should be installed - no version constraint
+  - name: vllm-entropy-decoder
+    source: git
+    url: https://github.com/BudEcosystem/vllm-plugins
+    subdirectory: plugins/vllm-entropy-decoder
+    enabled: true
